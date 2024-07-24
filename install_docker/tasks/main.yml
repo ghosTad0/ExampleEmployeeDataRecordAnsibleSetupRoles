@@ -1,0 +1,63 @@
+---
+# tasks file for install_docker
+- name: Gather facts
+  setup:
+
+- name: Check docker ps without sudo
+  become: no
+  ansible.builtin.shell:
+    cmd: docker ps
+  ignore_errors: yes
+  register: docker_cmds_running_without_sudo_details
+
+- name: Stop if docker already exists and can access without sudo
+  block:
+    - name: Check docker ps without sudo
+      debug:
+        msg: "Docker is installed and can run with default user. Skipping..."
+      when: not docker_cmds_running_without_sudo_details.failed
+  
+  rescue:
+    - name: Step1 - Setup docker's app repository
+      ansible.builtin.shell:
+        cmd: |
+          apt update -y
+          apt install ca-certificates curl -y
+          install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          chmod a+r /etc/apt/keyrings/docker.asc
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          apt update -y
+
+    - name: Step2 - Install docker components
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-buildx-plugin
+          - docker-compose-plugin
+        state: latest
+
+    - name: Step3 - Postinstall steps
+      become: no
+      ansible.builtin.shell:
+        cmd: |
+          sudo groupadd docker
+          sudo usermod -aG docker $USER
+
+    - name: Step4 - Checking docker ps functionality without sudo
+      become: no
+      ansible.builtin.shell:
+        cmd: docker ps
+      register: check_docker_without_sudo_details
+      ignore_errors: yes
+
+    - name: Step5 - Stackoverflow suggestions (https://stackoverflow.com/questions/48568172/docker-sock-permission-denied)
+      become: no
+      ansible.builtin.shell:
+        cmd: newgrp docker
+      when: check_docker_without_sudo_details.failed

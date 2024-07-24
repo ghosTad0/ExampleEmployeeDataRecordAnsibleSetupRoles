@@ -1,0 +1,13 @@
+---
+- name: Playbook for overall sample app setup
+  hosts: appservers
+  become: yes
+
+  tasks:
+    - name: Install docker
+      import_role:
+        name: install_docker
+
+    - name: Setup mysql
+      import_role:
+        name: setup_mysql
