@@ -6,16 +6,6 @@
     extensions:
       - "yml"
 
-# - name: Check user
-#   become: no
-#   shell:
-#     cmd: pwd
-#   register: check_user_details
-
-# - name: Print return information from the previous task
-#   ansible.builtin.debug:
-#     var: check_user_details.failed
-
 - name: Directory to save the docker compose files (for the tools needed for webapps)
   ansible.builtin.file:
     path: "{{ docker_compose_file_directory }}"
@@ -31,7 +21,7 @@
     
 - name: Copy docker compose file
   copy:
-    src: mysql_docker_compose.yml
+    src: "mysql_docker_compose.yml"
     dest: "{{ docker_compose_file_directory }}/mysql_docker_compose.yml"
     owner: "{{ ansible_user }}"
     group: "{{ ansible_user }}"

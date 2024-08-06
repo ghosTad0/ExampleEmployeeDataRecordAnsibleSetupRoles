@@ -72,3 +72,77 @@ Note:
     Ansible will automatically load variables from vars/main.yml and make them available to all roles in the collection when you run your playbook.
 
 This method allows you to maintain centralized and reusable variables across multiple roles within an Ansible collection, promoting consistency and simplifying maintenance of your playbooks and roles. Adjust the paths and file names based on your specific collection structure and naming conventions.
+
+
+
+
+
+
+
+
+
+
+If you have multiple YAML files with different names in your vars/ directory and you want to ensure all variables are available to roles within your Ansible collection, you can use Ansible’s include_vars module to import all these files dynamically. This approach will make all the variables in those files available for use in your roles.
+Steps to Import All YAML Files from vars/
+
+    Create a Directory for Variable Files:
+    Ensure your vars/ directory contains all the YAML files with your variables.
+
+    Example structure:
+
+    python
+
+my_collection/
+├── roles/
+│   ├── role1/
+│   │   ├── tasks/
+│   │   ├── defaults/
+│   │   └── ...
+│   ├── role2/
+│   │   ├── tasks/
+│   │   ├── defaults/
+│   │   └── ...
+│   └── ...
+├── vars/
+│   ├── file1.yml
+│   ├── file2.yml
+│   └── ...
+└── galaxy.yml
+
+Create a Main Variable File for Importing:
+Create a main YAML file (e.g., vars/main.yml) that will include all other YAML files.
+
+yaml
+
+# vars/main.yml
+- import_vars: "{{ item }}"
+with_fileglob:
+  - vars/*.yml
+
+This vars/main.yml file uses the import_vars directive to dynamically import all YAML files found in the vars/ directory.
+
+Include the Variables in Your Roles:
+In each role that needs access to these variables, you should include the main variable file in your tasks/main.yml or another suitable location.
+
+yaml
+
+# roles/role1/tasks/main.yml
+- name: Include all variables from vars directory
+  include_vars:
+    file: "{{ playbook_dir }}/vars/main.yml"
+
+- name: Example task using a common variable
+  debug:
+    msg: "Common variable: {{ common_variable1 }}"
+
+Referencing Variables in Roles:
+Once included, all variables defined in the vars/ directory are accessible within your roles.
+
+    Example usage in a role’s task:
+
+    yaml
+
+# roles/role1/tasks/main.yml
+- name: Example task using common variable
+  debug:
+    msg: "Common variable 1: {{ common_variable1 }}"

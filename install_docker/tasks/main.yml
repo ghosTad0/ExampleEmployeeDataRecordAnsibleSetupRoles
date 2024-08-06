@@ -3,21 +3,14 @@
 - name: Gather facts
   setup:
 
-- name: Check docker ps without sudo
-  become: no
+- name: Checking docker installation
   ansible.builtin.shell:
     cmd: docker ps
   ignore_errors: yes
-  register: docker_cmds_running_without_sudo_details
+  register: docker_installation_details
 
-- name: Stop if docker already exists and can access without sudo
+- name: Docker installation not found task execution scenario, tasks list
   block:
-    - name: Check docker ps without sudo
-      debug:
-        msg: "Docker is installed and can run with default user. Skipping..."
-      when: not docker_cmds_running_without_sudo_details.failed
-  
-  rescue:
     - name: Step1 - Setup docker's app repository
       ansible.builtin.shell:
         cmd: |
@@ -48,7 +41,7 @@
         cmd: |
           sudo groupadd docker
           sudo usermod -aG docker $USER
-
+    
     - name: Step4 - Checking docker ps functionality without sudo
       become: no
       ansible.builtin.shell:
@@ -61,3 +54,9 @@
       ansible.builtin.shell:
         cmd: newgrp docker
       when: check_docker_without_sudo_details.failed
+  when: docker_installation_details.failed
+
+- name: Docker installation found prompt
+  debug:
+    msg: "Docker already found on server"
+  when: not docker_installation_details.failed

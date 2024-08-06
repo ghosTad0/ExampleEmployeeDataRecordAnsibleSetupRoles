@@ -1,0 +1,9 @@
+ 1103  ansible-galaxy collection install ansible.posix
+ 1188  ansible-galaxy init install_docker
+ 1189  ansible-galaxy init uninstall_docker
+ 1190  ansible-galaxy init deploy_sample_app
+ 1191  ansible-galaxy init undeploy_sample_app
+ 1192  ansible-galaxy init setup_mysql
+ 1193  ansible-galaxy init stop_mysql
+ 1201  ansible-galaxy collection init hms.aap_sample_app_deployment
+ 1999  history | grep "ansible-galaxy"
