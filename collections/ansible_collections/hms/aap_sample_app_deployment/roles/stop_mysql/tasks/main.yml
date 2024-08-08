@@ -1,0 +1,31 @@
+---
+# tasks file for stop_mysql
+- name: Include vars from vars directory
+  include_vars:
+    dir: vars
+    extensions:
+      - "yml"
+
+- name: Check docker mysql service
+  become: no
+  ansible.builtin.shell:
+      cmd: docker ps | grep "mysql_docker"
+  register: check_docker_mysql_service_details
+  ignore_errors: yes
+
+- name: Check docker mysql service prompt
+  ansible.builtin.debug:
+    msg: "mysql service is not up."
+  when: check_docker_mysql_service_details.failed
+
+- name: Down the mysql container
+  become: no
+  # ansible.builtin.shell:
+  #    cmd: |
+  #     source ~/.bashrc
+  #     stop_mysql
+  # vars:
+  #   ansible_shell_type: bash   #This does not work becz of a known bug. instead of /bin/bash, ansible connects with /bin/sh, this does not support for some commands.
+  ansible.builtin.shell:
+    cmd: docker compose -f {{ docker_compose_file_directory }}/mysql_docker_compose.yml down
+  when: not check_docker_mysql_service_details.failed

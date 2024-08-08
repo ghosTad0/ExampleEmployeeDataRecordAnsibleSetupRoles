@@ -20,7 +20,19 @@
 #       ansible.builtin.import_role:
 #         name: hms.aap_sample_app_deployment.setup_nginx
 
-- name: Playbook for webserver setup
+- name: Playbook chapter for appserver setup
+  hosts: appservers
+  become: yes
+  vars_files:
+    - __vars/common_vars.yml
+  collections: 
+    - hms.aap_sample_app_deployment
+  roles:
+    - install_docker
+    - setup_mysql
+    - deploy_appserver
+
+- name: Playbook chapter for webserver setup
   hosts: webservers
   become: yes
   vars_files:
@@ -29,3 +41,4 @@
     - hms.aap_sample_app_deployment
   roles:
     - setup_nginx
+    - deploy_webserver

@@ -1,0 +1,36 @@
+---
+- name: Playbook chapter for unset the sample app webserver components using collections
+  hosts: webservers
+  become: yes
+  vars_files:
+  - __vars/common_vars.yml
+  gather_facts: yes
+  collections: hms.aap_sample_app_deployment
+  roles:
+    - undeploy_sample_app
+    - uninstall_nginx
+  # tasks:
+  #   - name: Undeploy sample app
+  #     import_role:
+  #       name: undeploy_sample_app
+  #   - name: uninstall nginx
+  #     import_role:
+  #       name: uninstall_nginx
+
+- name: Playbook chapter for unset the sample app app server components using collections
+  hosts: appservers
+  become: yes
+  vars_files:
+  - __vars/common_vars.yml
+  gather_facts: yes
+  collections: hms.aap_sample_app_deployment
+  roles:
+    - stop_mysql
+    - uninstall_docker
+  # tasks:
+  #   - name: stop mysql
+  #     import_role:
+  #       name: stop_mysql
+  #   - name: Uninstall docker
+  #     import_role:
+  #       name: uninstall_docker
