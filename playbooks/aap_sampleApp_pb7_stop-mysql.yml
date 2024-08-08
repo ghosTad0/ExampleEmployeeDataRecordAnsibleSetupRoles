@@ -1,0 +1,9 @@
+- name: Playbook for mysql stop
+  hosts: appservers
+  become: yes
+  vars_files:
+    - __vars/common_vars.yml
+  collections: 
+    - hms.aap_sample_app_deployment
+  roles:
+    - stop_mysql
