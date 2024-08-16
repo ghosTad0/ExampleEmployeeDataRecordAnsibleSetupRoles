@@ -1,18 +1,18 @@
 ---
 # tasks file for setup_nginx
-- name: Printing tad_s content
-  ansible.builtin.debug:
-    var: tads_test_flag1
+# - name: Printing tad_s content
+#   ansible.builtin.debug:
+#     var: tads_test_flag1
 
-- name: Adding a pause
-  ansible.builtin.pause:
-    seconds: 15
+# - name: Adding a pause
+#   ansible.builtin.pause:
+#     seconds: 15             THESE ABOVE 2 TASKS WORK, VARIABLES CAN BE IMPORTED
     
-- name: Checking nginx service
-  ansible.builtin.shell:
-    cmd: systemctl status nginx
-  register: checking_nginx_service_details
-  ignore_errors: yes
+# - name: Checking nginx service
+#   ansible.builtin.shell:
+#     cmd: systemctl status nginx
+#   register: checking_nginx_service_details
+#   ignore_errors: yes
 
 - name: Not found nginx scenario, tasks execution
   block:
@@ -27,12 +27,12 @@
         name: nginx
         state: started
       register: nginx_installation_details
-  when: checking_nginx_service_details.failed
+  # when: checking_nginx_service_details.failed
 
-- name: Checking nginx service status prompt
-  ansible.builtin.debug:
-    msg: "Nginx is already installed in the system"
-  when: not checking_nginx_service_details.failed
+# - name: Checking nginx service status prompt
+#   ansible.builtin.debug:
+#     msg: "Nginx is already installed in the system"
+#   when: not checking_nginx_service_details.failed
 
 - name: Post installation steps tasks execution
   block:

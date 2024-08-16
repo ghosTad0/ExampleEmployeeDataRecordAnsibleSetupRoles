@@ -2,8 +2,19 @@
   hosts: webservers
   become: yes
   vars_files:
-    - __vars/common_vars.yml
+    - ../__vars/common_vars.yml
   collections: 
     - hms.aap_sample_app_deployment
-  roles:
-    - setup_nginx
+  # roles:
+  #   - setup_nginx
+  tasks:
+    - name: checking availability of port 8080 (if available, nginx confs are applied)
+      shell:
+        cmd: curl -k localhost:8080
+      register: port8080check_details
+      ignore_errors: yes
+
+    - name: Running nginx setup role
+      import_role:
+        name: setup_nginx
+      when: port8080check_details is failed
